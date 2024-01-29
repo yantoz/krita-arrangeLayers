@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Krita/PythonPlugin
+X-KDE-Library=arrangeLayers
+X-Python-2-Compatible=false
+X-Krita-Manual=manual.html
+Name=Arrange Layers
+Comment=Arrange Layers
