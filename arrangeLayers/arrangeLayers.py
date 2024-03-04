@@ -42,6 +42,21 @@ def testEnable():
             
 def processArrange(alignH, alignV): # 0: NOP, 1: L/T, 2: C/C, 3: R/B, 4: D/D
 
+    def processAlign(layer, refBounds):
+        bounds = layer.bounds()
+        if alignH == 1:
+            moveTo(layer, refBounds.x(), bounds.y())
+        elif alignH == 2:
+            moveTo(layer, refBounds.x()+(refBounds.width()-bounds.width())/2, bounds.y())
+        elif alignH == 3:
+            moveTo(layer, refBounds.x()+refBounds.width()-bounds.width(), bounds.y())
+        elif alignV == 1:
+            moveTo(layer, bounds.x(), refBounds.y())
+        elif alignV == 2:
+            moveTo(layer, bounds.x(), refBounds.y()+(refBounds.height()-bounds.height())/2)
+        elif alignV == 3:
+            moveTo(layer, bounds.x(), refBounds.y()+refBounds.height()-bounds.height())
+
     enableA, enableD, activeLayer, processLayers = testEnable()
             
     if alignH == 4:
@@ -84,25 +99,16 @@ def processArrange(alignH, alignV): # 0: NOP, 1: L/T, 2: C/C, 3: R/B, 4: D/D
         for layer in layers[1:]:
             moveTo(layer, layer.bounds().x(), y)
             y += layer.bounds().height() - 1 + gap + 1                
-    else:
-        if not enableA:
-            return
+    elif enableA:
+        # align selected layers to active layer
         activeBounds = activeLayer.bounds()
         for layer in processLayers:
-            bounds = layer.bounds()
-            if alignH == 1:
-                moveTo(layer, activeBounds.x(), bounds.y())
-            elif alignH == 2:
-                moveTo(layer, activeBounds.x()+(activeBounds.width()-bounds.width())/2, bounds.y())
-            elif alignH == 3:
-                moveTo(layer, activeBounds.x()+activeBounds.width()-bounds.width(), bounds.y())
-            elif alignV == 1:
-                moveTo(layer, bounds.x(), activeBounds.y())
-            elif alignV == 2:
-                moveTo(layer, bounds.x(), activeBounds.y()+(activeBounds.height()-bounds.height())/2)
-            elif alignV == 3:
-                moveTo(layer, bounds.x(), activeBounds.y()+activeBounds.height()-bounds.height())
-            
+            processAlign(layer, activeBounds)
+    else:
+        # align active layer to page
+        pageBounds = Application.activeDocument().bounds()
+        processAlign(activeLayer, pageBounds)
+ 
     Application.activeDocument().refreshProjection()
 
 def e_alignLeft():
@@ -191,7 +197,6 @@ class arrangeLayersExtension(krita.Extension):
                 self.actions[i+6].setEnabled(enableD)
         except:
             pass
-        print([a.isEnabled() for a in self.actions])
 
 class ArrangeLayersDocker(krita.DockWidget):
 
@@ -269,7 +274,8 @@ KI.addExtension(extension)
 KI.addDockWidgetFactory(krita.DockWidgetFactory("Arrange Layers", krita.DockWidgetFactoryBase.DockRight, ArrangeLayersDocker))
 
 def layerChanged():
-    enableA, enableD, _, _ = testEnable()
+    enableA, enableD, activeLayer, _ = testEnable()
+    enableA = enableA or (activeLayer is not None)
     extension.setEnable(enableA, enableD)
     if docker:
         docker.setEnable(enableA, enableD)
