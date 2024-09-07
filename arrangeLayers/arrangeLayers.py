@@ -189,16 +189,16 @@ class arrangeLayersExtension(krita.Extension):
             return
         if self.menu:
             self.menu.setEnabled(enableA or enableD)
-        try:
-            for i in range(6):
+        for i in range(6):
+            try:
                 self.actions[i].setEnabled(enableA)
-        except:
-            pass
-        try:
-            for i in range(2):
+            except:
+                pass
+        for i in range(2):
+            try:
                 self.actions[i+6].setEnabled(enableD)
-        except:
-            pass
+            except:
+                pass
 
 class ArrangeLayersDocker(krita.DockWidget):
 
@@ -254,16 +254,16 @@ class ArrangeLayersDocker(krita.DockWidget):
     def setEnable(self, enableA, enableD):
         if not self.buttons:
             return
-        try:
-            for i in range(6):
+        for i in range(6):
+            try:
                 self.buttons[i].setEnabled(enableA)
-        except:
-            pass
-        try:
-            for i in range(2):
+            except:
+                pass
+        for i in range(2):
+            try:
                 self.buttons[i+6].setEnabled(enableD)
-        except:
-            pass
+            except:
+                pass
 
     def canvasChanged(self, canvas):
         pass
