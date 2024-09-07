@@ -34,9 +34,11 @@ def testEnable():
     for layer in selectedLayers:
         if layer in topLevelLayers and layer != activeLayer:
             processLayers.append(layer)
-            
-    enableA = activeLayer and len(processLayers) > 0
-    enableD = activeLayer and len(processLayers) > 1
+
+    activeLayerExists = activeLayer is not None
+
+    enableA = activeLayerExists and len(processLayers) > 0
+    enableD = activeLayerExists and len(processLayers) > 1
     
     return (enableA, enableD, activeLayer, processLayers)
             
