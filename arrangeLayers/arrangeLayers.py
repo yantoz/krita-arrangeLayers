@@ -113,6 +113,25 @@ def processArrange(alignH, alignV): # 0: NOP, 1: L/T, 2: C/C, 3: R/B, 4: D/D
  
     Application.activeDocument().refreshProjection()
 
+def processArrangeSize(alignW, alignH):
+
+    enableA, enableD, activeLayer, processLayers = testEnable()
+
+    if not enableA:
+        return
+
+    w = activeLayer.bounds().width();
+    h = activeLayer.bounds().height();
+
+    for layer in processLayers:
+        w_ = layer.bounds().width();
+        h_ = layer.bounds().height();
+        if alignW:
+            w_ = w
+        if alignH:
+            h_ = h
+        layer.scaleNode(layer.bounds().topLeft(), w_, h_, "Bicubic")
+
 def e_alignLeft():
     processArrange(1, 0)
     
@@ -136,6 +155,12 @@ def e_distributeH():
     
 def e_distributeV():
     processArrange(0, 4)
+
+def e_sameW():
+    processArrangeSize(True, False)
+
+def e_sameH():
+    processArrangeSize(False, True)
 
 class arrangeLayersExtension(krita.Extension):
  
@@ -169,6 +194,9 @@ class arrangeLayersExtension(krita.Extension):
             None,
             ["arrangeLayersDistH", "Distribute Horizontally", e_distributeH],
             ["arrangeLayersDistV", "Distribute Vertically", e_distributeV],
+            None,
+            ["arrangeLayersSameW", "Same Width", e_sameW],
+            ["arrangeLayersSameH", "Same Height", e_sameH],
         ]
 
         self.actions = []
@@ -199,6 +227,11 @@ class arrangeLayersExtension(krita.Extension):
                 self.actions[i+6].setEnabled(enableD)
             except:
                 pass
+        for i in range(2):
+            try:
+                self.actions[i+8].setEnabled(enableA)
+            except:
+                pass
 
 class ArrangeLayersDocker(krita.DockWidget):
 
@@ -221,6 +254,9 @@ class ArrangeLayersDocker(krita.DockWidget):
             None,
             ["distribute-horizontal", "Distribute Horizontally", e_distributeH],
             ["distribute-vertical", "Distribute Vertically", e_distributeV],        
+            None,
+            ["zoom-horizontal", "Same Width", e_sameW],
+            ["zoom-vertical", "Same Height", e_sameH],
         ]
     
         arrangeLayout = QHBoxLayout()
@@ -262,6 +298,11 @@ class ArrangeLayersDocker(krita.DockWidget):
         for i in range(2):
             try:
                 self.buttons[i+6].setEnabled(enableD)
+            except:
+                pass
+        for i in range(2):
+            try:
+                self.buttons[i+8].setEnabled(enableA)
             except:
                 pass
 
